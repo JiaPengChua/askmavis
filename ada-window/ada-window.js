@@ -88,10 +88,11 @@ async function send(text, source) {
   if (sending) return;
   sending = true;
   try {
-    // The Greeting is still waiting on "Would you like to sign in?". A card question typed into that
-    // ask is swallowed as its answer, so decline first and let the Greeting finish, then ask.
+    // The Greeting may still be waiting on "Would you like to sign in?". Sending straight into it
+    // works (Mavis treats the question as off-script and answers it). ?decline instead answers
+    // "No" first and lets the Greeting finish — kept for comparison.
     const ask = findSignInAsk(messages);
-    if (ask && !params.has("direct")) {
+    if (ask && params.has("decline")) {
       log("declining pending sign-in ask before", source);
       await ada.selectQuickReply(ask.message.id, ask.no);
       lastInbound = Date.now();

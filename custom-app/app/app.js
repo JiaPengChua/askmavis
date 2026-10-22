@@ -52,19 +52,10 @@ async function send(text, source = "composer") {
   if (!text || busy) return;
   busy = true;
   try {
-    const list = rows();
-    const ask = findSignInAsk(norm(list));
-    if (ask) {
-      // A question typed into the Greeting's pending sign-in ask is consumed as its answer —
-      // decline it first and let the Greeting finish quietly behind the hero.
-      log("decline sign-in ask before", source);
-      client.operations.selectQuickReply(ask.message.replies[ask.no], ask.message.id);
-      await quiet();
-    }
+    // Sending straight into the Greeting's pending "Would you like to sign in?" ask works: Mavis
+    // treats the question as off-script and answers it (verified live on the Ada-window page).
     const handle = client.operations.sendMessage(text.slice(0, 500));
-    if (!startAt || !rows().some((m) => m.sender === "user" && (m.clientKey === startAt.key || m.id === startAt.id))) {
-      if (!startAt) setStartAt({ key: handle.tempMessageUuid });
-    }
+    if (!startAt) setStartAt({ key: handle.tempMessageUuid });
     log("sent", source, text);
   } catch (e) {
     log("send failed", e);

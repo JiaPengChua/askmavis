@@ -22,9 +22,11 @@ export function findSignInAsk(messages) {
   return null;
 }
 
-/** True once the Greeting's signed-in branch has greeted the customer by time of day. */
+/** True once the Greeting's signed-in branch has greeted the customer by name
+ *  ("Good Evening Mr Tan!" = time of day + title + last name; guests only get "Good Evening!"). */
 export function looksSignedIn(messages, sinceIndex = 0) {
-  return messages.slice(sinceIndex).some(
-    (m) => m.sender === "bot" && m.type === "text" && /^(good (morning|afternoon|evening)|selamat)\b/i.test((m.body || "").trim()) && /[A-Z][a-z]+\s*!?$/.test((m.body || "").trim())
-  );
+  return messages.slice(sinceIndex).some((m) => {
+    const t = (m.body || "").trim();
+    return m.sender === "bot" && m.type === "text" && /^good (morning|afternoon|evening)\s+\S+\s+\S+/i.test(t) && t.length < 80;
+  });
 }
