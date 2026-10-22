@@ -36,7 +36,10 @@ const S = () => client.getState() || {};
 // thread starts at the customer's first action: `startAt` names that row (by id or clientKey).
 const KEY = "askmavis.startAt";
 let startAt = (() => { try { return JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch { return null; } })();
-const setStartAt = (v) => { startAt = v; try { sessionStorage.setItem(KEY, JSON.stringify(v)); } catch {} };
+const setStartAt = (v) => {
+  startAt = v && { ...v, conv: S()["chat.conversationId"] || null };
+  try { sessionStorage.setItem(KEY, JSON.stringify(startAt)); } catch {}
+};
 let loginPending = false, signedIn = false;
 
 function rows() {
@@ -218,7 +221,7 @@ function render() {
   requestAnimationFrame(() => { renderQueued = false; paint(); });
 }
 
-let lastSig = "";
+let lastSig = "", pendingSince = 0;
 function paint() {
   const st = S();
   if (st["app.loading"] === false || (st["chat.messages"] || []).length) $("boot").classList.add("gone");
@@ -230,11 +233,19 @@ function paint() {
   if (loginPending && !signedIn && lastUser && /^no\b/i.test(lastUser.body)) loginPending = false;
   bar.setLogin(signedIn ? "signed" : loginPending ? "busy" : "idle");
 
-  // Where the visible thread starts.
+  // Where the visible thread starts. A marker from an earlier conversation (reload, End Chat) is stale.
+  const conv = st["chat.conversationId"];
+  if (startAt && conv && startAt.conv && startAt.conv !== conv) setStartAt(null);
+  if (startAt && !startAt.conv && conv && startAt.id && !all.some((m) => m.id === startAt.id)) setStartAt(null);
   let from = -1;
   if (startAt) from = all.findIndex((m) => (startAt.key && m.clientKey === startAt.key) || (startAt.id && m.id === startAt.id));
   if (from < 0 && !startAt) from = all.findIndex((m) => m.sender === "user") >= 0 ? 0 : -1; // restored chat with no marker
-  const pendingOwnSend = startAt && from < 0; // our first message is in flight
+  let pendingOwnSend = startAt && from < 0; // our first message is in flight
+  if (pendingOwnSend) {
+    pendingSince ||= Date.now();
+    if (Date.now() - pendingSince > 30000) { setStartAt(null); pendingOwnSend = false; } // never arrived
+    else setTimeout(render, 1000);
+  } else pendingSince = 0;
   const heroMode = from < 0 && !pendingOwnSend;
   $("am-hero").hidden = !heroMode;
   $("thread").hidden = heroMode;
