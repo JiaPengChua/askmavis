@@ -21,7 +21,8 @@
   .aw-window iframe{border:0}
   .aw-window .boot{height:100%;display:grid;place-items:center;color:var(--grey-ultradark);font-size:14px}
   @media(max-width:900px){
-    .aw-grid{grid-template-columns:1fr;gap:0;padding:0 16px}
+    .aw-grid{grid-template-columns:minmax(0,1fr);gap:0;padding:0 16px}
+    .aw-left{min-width:0}
     .aw-left .am-hero{padding-top:22px}
     .aw-left .am-cards{flex-direction:row;overflow-x:auto;gap:10px;margin:18px -16px 0;padding:2px 16px 8px;scroll-snap-type:x mandatory}
     .aw-left .am-card{min-width:78%;scroll-snap-align:start}

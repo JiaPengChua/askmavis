@@ -52,7 +52,7 @@ svg.i{width:18px;height:18px;flex:none}
 .am-pill.login.signed{background:var(--primary-blue-dark);color:#fff;border-color:var(--primary-blue-dark)}
 .am-pill.icon{padding:0 28px}
 .am-pill svg{width:16px;height:16px}
-@media(max-width:640px){.am-bar{padding:14px 16px 0}.am-pill{height:40px;padding:0 14px;font-size:11px}.am-pill .ff-label{display:none}.am-pill.icon{padding:0 14px}}
+@media(max-width:640px){.am-bar{padding:14px 16px 0;gap:8px}.am-actions{gap:8px}.am-brand{font-size:17px}.am-pill{height:40px;padding:0 14px;font-size:11px}.am-pill .ff-label{display:none}.am-pill.icon{padding:0 12px}}
 
 /* ---------- hero + prompt cards ---------- */
 .am-hero{max-width:720px;margin:0 auto;padding:64px 20px 0}
