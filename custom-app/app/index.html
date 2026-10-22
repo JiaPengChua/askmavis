@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AskMavis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../shared/brand.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app">
+  <div id="am-bar"></div>
+  <div class="scroll" id="scroll">
+    <div id="am-hero"></div>
+    <div class="thread" id="thread" hidden></div>
+  </div>
+  <div class="dock">
+    <form class="am-composer" id="composer">
+      <label class="sr-only" for="q">Ask a question</label>
+      <textarea id="q" rows="2" maxlength="500" placeholder="Ask a question..."></textarea>
+      <button class="am-send" id="sendbtn" type="submit" aria-label="Send message"></button>
+    </form>
+    <p class="am-disclaimer" id="am-disclaimer"></p>
+  </div>
+  <div class="boot" id="boot">Connecting to Mavis…</div>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

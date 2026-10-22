@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AskMavis — Custom App</title>
+<meta name="description" content="AskMavis AI Mode mockup: a custom conversation app hosted inside Ada's Messaging frame.">
+<link rel="icon" href="../assets/mh-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/brand.css">
+<style>
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;background:var(--page-bg)}
+  #ada-root{flex:1;min-height:0;position:relative}
+  #ada-root iframe{border:0}
+  #ada-root .boot{position:absolute;inset:0;display:grid;place-items:center;color:var(--grey-ultradark);font-size:14px}
+</style>
+</head>
+<body>
+<header class="mh-header" id="mh-header"></header>
+<div class="am-note" id="am-note" hidden></div>
+<main id="ada-root" aria-label="AskMavis"><div class="boot">Loading AskMavis…</div></main>
+<script type="module">
+  import { createAdaEmbedInterface } from "https://messaging-assets.ada.support/sdk.js";
+  import { HANDLE } from "../shared/content.js";
+  import { MH_HEADER } from "../shared/chrome.js";
+
+  document.getElementById("mh-header").innerHTML = MH_HEADER("../assets/");
+  const note = document.getElementById("am-note");
+  const params = new URLSearchParams(location.search);
+  const ada = createAdaEmbedInterface();
+  const root = document.getElementById("ada-root");
+
+  try {
+    root.innerHTML = "";
+    await ada.start({
+      handle: HANDLE,
+      parentElement: root,
+      // The custom app lives next to this page; Ada mounts it in place of its default UI.
+      appUrl: new URL("./app/", location.href).href,
+      metaFields: { askmavis_surface: "custom-app" },
+      onAdaEmbedLoaded: () => {
+        ada.subscribeEvent("ada.customApp.fallback", (d) => {
+          console.warn("[askmavis] custom app fell back to Ada's default app", d);
+          note.textContent = `Ada fell back to its default chat UI (${d.code}). ${d.code === "origin_not_allowlisted" ? "Add " + location.origin + " to the Messaging Allowed websites list." : ""}`;
+          note.hidden = false;
+        });
+      },
+    });
+    if (params.has("reset")) { await ada.reset(); history.replaceState(null, "", location.pathname); }
+  } catch (e) {
+    note.textContent = `AskMavis could not start (${e.message || e}).`;
+    note.hidden = false;
+  }
+</script>
+</body>
+</html>
