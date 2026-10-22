@@ -55,8 +55,18 @@ async function send(text, source = "composer") {
   if (!text || busy) return;
   busy = true;
   try {
-    // Sending straight into the Greeting's pending "Would you like to sign in?" ask works: Mavis
-    // treats the question as off-script and answers it (verified live on the Ada-window page).
+    // Sending straight into the Greeting's pending "Would you like to sign in?" ask is a coin flip
+    // (live: answered 2/3, re-asked the sign-in question 1/3 and dropped the card). Answer "No"
+    // first and let the Greeting finish behind the hero; the thread starts at the customer's send.
+    const ask = findSignInAsk(norm(rows()));
+    if (ask) {
+      log("decline sign-in ask before", source);
+      client.operations.selectQuickReply(ask.message.replies[ask.no], ask.message.id);
+      lastInbound = Date.now();
+      pendingFirst = text; lastSig = ""; render(); // show the question + typing while the Greeting settles
+      await quiet();
+      pendingFirst = null;
+    }
     const handle = client.operations.sendMessage(text.slice(0, 500));
     if (!startAt) setStartAt({ key: handle.tempMessageUuid });
     log("sent", source, text);
@@ -231,7 +241,7 @@ function render() {
   requestAnimationFrame(() => { renderQueued = false; paint(); });
 }
 
-let lastSig = "", pendingSince = 0, convChecked = false;
+let lastSig = "", pendingSince = 0, convChecked = false, pendingFirst = null;
 function paint() {
   const st = S();
   if (st["app.loading"] === false || (st["chat.messages"] || []).length) $("boot").classList.add("gone");
@@ -259,13 +269,13 @@ function paint() {
     if (Date.now() - pendingSince > 30000) { setStartAt(null); pendingOwnSend = false; } // never arrived
     else setTimeout(render, 1000);
   } else pendingSince = 0;
-  const heroMode = from < 0 && !pendingOwnSend;
+  const heroMode = from < 0 && !pendingOwnSend && !pendingFirst;
   $("am-hero").hidden = !heroMode;
   $("thread").hidden = heroMode;
   if (heroMode) return;
 
-  const visible = from >= 0 ? all.slice(from) : [];
-  const typing = st["chat.isGenerating"] || st["ui.typingIndicator.visible"] || pendingOwnSend;
+  const visible = from >= 0 ? all.slice(from) : pendingFirst ? [{ id: "pending", sender: "user", type: "text", body: pendingFirst }] : [];
+  const typing = st["chat.isGenerating"] || st["ui.typingIndicator.visible"] || pendingOwnSend || !!pendingFirst;
   const sig = JSON.stringify([visible.map((m) => [m.id, m.clientKey, (m.body || "").length, m.type]), st["chat.answeredInteractiveIds"], typing]);
   if (sig === lastSig) return;
   lastSig = sig;

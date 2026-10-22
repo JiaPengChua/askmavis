@@ -93,11 +93,11 @@ async function send(text, source) {
   if (sending) return;
   sending = true;
   try {
-    // The Greeting may still be waiting on "Would you like to sign in?". Sending straight into it
-    // works (Mavis treats the question as off-script and answers it). ?decline instead answers
-    // "No" first and lets the Greeting finish — kept for comparison.
+    // The Greeting may still be waiting on "Would you like to sign in?". Sending straight into it is
+    // a coin flip (live: answered 2/3, re-asked the sign-in question 1/3 and dropped the card), so
+    // answer "No" first, let the Greeting finish, then ask. ?direct skips this for comparison.
     const ask = findSignInAsk(messages);
-    if (ask && params.has("decline")) {
+    if (ask && !params.has("direct")) {
       log("declining pending sign-in ask before", source);
       await ada.selectQuickReply(ask.message.id, ask.no);
       lastInbound = Date.now();
