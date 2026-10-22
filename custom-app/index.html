@@ -49,6 +49,12 @@
       },
     });
     if (params.has("reset")) { await ada.reset(); history.replaceState(null, "", location.pathname); }
+    // The custom app's Login button asks for the Greeting to run again (host-only SDK method).
+    window.addEventListener("message", async (e) => {
+      if (e.origin !== location.origin || e.data?.type !== "askmavis:triggerGreeting") return;
+      try { await ada.triggerGreeting(); }
+      catch (err) { e.source?.postMessage({ type: "askmavis:triggerGreeting:failed", error: String(err?.message || err) }, location.origin); }
+    });
   } catch (e) {
     note.textContent = `AskMavis could not start (${e.message || e}).`;
     note.hidden = false;

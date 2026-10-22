@@ -85,9 +85,9 @@ svg.i{width:18px;height:18px;flex:none}
 /* ---------- "View Smart Options" panel ---------- */
 .am-scrim{position:fixed;inset:0;background:rgba(4,16,73,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:90}
 .am-panel{position:fixed;top:0;right:0;bottom:0;width:min(620px,100vw);background:#fff;z-index:91;transform:translateX(100%);transition:transform .25s ease;
-  padding:34px 40px;overflow-y:auto;box-shadow:-8px 0 30px rgba(4,16,73,.18)}
+  padding:34px 40px;overflow-y:auto;box-shadow:-8px 0 30px rgba(4,16,73,.18);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
 .am-open .am-scrim{opacity:1;pointer-events:auto}
-.am-open .am-panel{transform:none}
+.am-open .am-panel{transform:none;visibility:visible;transition:transform .25s ease}
 .am-panel h2{margin:0 0 32px;font-family:var(--serif);font-weight:600;font-size:32px;color:var(--primary-blue-dark)}
 .am-close{position:absolute;top:16px;right:16px;width:26px;height:26px;border-radius:50%;border:0;background:var(--grey-dark);color:#fff;cursor:pointer;display:grid;place-items:center}
 .am-close svg{width:14px;height:14px}

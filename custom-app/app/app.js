@@ -84,11 +84,36 @@ function login() {
     client.operations.selectQuickReply(ask.message.replies[ask.yes], ask.message.id);
     render();
   } else {
-    log("login → no pending ask, asking Mavis");
-    busy = false;
+    // The Greeting's question has scrolled past. Only the host SDK can re-run the Greeting, so ask
+    // the host page (same origin) to call triggerGreeting(); paint() answers the fresh ask with Yes.
+    // Typing "sign in" instead only gets a knowledge answer pointing at the Enrich website.
+    log("login → asking host to re-run the Greeting");
+    awaitingAsk = Date.now();
+    setTimeout(() => { lastSig = ""; paint(); }, 20500); // fire the fallback even if nothing arrives
+    window.top.postMessage({ type: "askmavis:triggerGreeting" }, location.origin);
+  }
+}
+let awaitingAsk = 0;
+function answerFreshAsk(list) {
+  if (!awaitingAsk) return;
+  const ask = findSignInAsk(norm(list));
+  if (ask) {
+    awaitingAsk = 0;
+    log("login → answering re-run Greeting ask: Yes");
+    client.operations.selectQuickReply(ask.message.replies[ask.yes], ask.message.id);
+  } else if (Date.now() - awaitingAsk > 20000) {
+    awaitingAsk = 0;
+    log("login → Greeting did not ask, falling back to a typed request");
     send(LOGIN_TEXT, "login");
   }
 }
+window.addEventListener("message", (e) => {
+  if (e.origin === location.origin && e.data?.type === "askmavis:triggerGreeting:failed") {
+    log("host could not re-run the Greeting", e.data.error);
+    awaitingAsk = 0;
+    send(LOGIN_TEXT, "login");
+  }
+});
 
 function openSignIn(m) {
   const w = window.open(m.authLink, "enrich_signin", "popup=yes,width=480,height=720");
@@ -198,6 +223,7 @@ function paint() {
   const st = S();
   if (st["app.loading"] === false || (st["chat.messages"] || []).length) $("boot").classList.add("gone");
   const all = rows();
+  answerFreshAsk(all);
   const n = norm(all);
   signedIn = looksSignedIn(n);
   const lastUser = [...n].reverse().find((m) => m.sender === "user");

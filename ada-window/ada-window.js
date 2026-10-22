@@ -50,6 +50,11 @@ const settled = (quietMs = 2200, capMs = 12000) =>
     })();
   });
 
+const waitFor = (fn, ms) => new Promise((resolve) => {
+  const t0 = Date.now();
+  (function tick() { const v = fn(); if (v || Date.now() - t0 > ms) return resolve(v || null); setTimeout(tick, 300); })();
+});
+
 /* ---------- SDK boot ---------- */
 const ada = createAdaEmbedInterface();
 let ready = false;
@@ -123,12 +128,19 @@ async function login() {
   loginMark = messages.length;
   armLoginTimeout();
   try {
-    const ask = findSignInAsk(messages);
+    let ask = findSignInAsk(messages);
+    if (!ask) {
+      // The Greeting's question has scrolled past — run the Greeting again so it asks afresh.
+      // (Typing "sign in" mid-chat only gets a knowledge answer pointing at the Enrich website.)
+      log("login: re-running Greeting");
+      await ada.triggerGreeting();
+      ask = await waitFor(() => findSignInAsk(messages), 20000);
+    }
     if (ask) {
       log("login: answering Greeting sign-in ask", ask.message.id);
       await ada.selectQuickReply(ask.message.id, ask.yes);
     } else {
-      log("login: no pending ask, asking Mavis");
+      log("login: Greeting did not ask, falling back to a typed request");
       await sendWithRetry(LOGIN_TEXT);
     }
   } catch (e) {
