@@ -88,13 +88,19 @@ function login() {
     render();
   } else {
     // The Greeting's question has scrolled past. Typing "sign in" mid-chat is unreliable (it can get
-    // a knowledge answer pointing at the Enrich website) and triggerGreeting() is a no-op once a
-    // greeting was sent. A new conversation reruns the Greeting; the old messages stay on screen.
-    log("login → new conversation for a fresh Greeting");
+    // a knowledge answer pointing at the Enrich website), triggerGreeting() is a no-op once a greeting
+    // was sent, and startNewConversation() closed the chat without opening a new one in testing.
+    // So the host page resets the session (like SQ, where login reloads the page) and the fresh
+    // Greeting's sign-in ask is answered with Yes. A reset can remount this frame, hence storage.
+    log("login → host reset for a fresh Greeting");
+    toast("Starting a new chat to sign you in…");
+    try { sessionStorage.setItem(AUTO_LOGIN, String(Date.now())); } catch {}
+    setStartAt(null);
     armAwait(false);
-    if (!client.operations.startNewConversation()) setTimeout(() => client.operations.startNewConversation(), 5200);
+    window.top.postMessage({ type: "askmavis:reset" }, location.origin);
   }
 }
+const AUTO_LOGIN = "askmavis.autoLogin";
 let awaitingAsk = 0, fellBack = false;
 function armAwait(isFallback) {
   awaitingAsk = Date.now();
@@ -106,6 +112,12 @@ function answerFreshAsk(list) {
   const ask = findSignInAsk(norm(list));
   if (ask) {
     awaitingAsk = 0;
+    try { sessionStorage.removeItem(AUTO_LOGIN); } catch {}
+    if (!startAt) {
+      const i = list.findIndex((m) => m.id === ask.message.id);
+      const from = i > 0 && list[i - 1].sender === "bot" && /sign in/i.test(list[i - 1].body || "") ? list[i - 1] : list[i];
+      setStartAt({ id: from.id });
+    }
     log("login → answering the Greeting's sign-in ask: Yes");
     client.operations.selectQuickReply(ask.message.replies[ask.yes], ask.message.id);
   } else if (Date.now() - awaitingAsk > 25000) {
@@ -299,6 +311,13 @@ function wire(row, m) {
   });
   row.querySelector("[data-ls-cancel]")?.addEventListener("click", () => client.operations.cancelListSelection());
 }
+
+// Login asked the host for a reset and this frame was remounted: keep waiting for the fresh ask.
+try {
+  const t = +sessionStorage.getItem(AUTO_LOGIN);
+  if (t && Date.now() - t < 60000) { loginPending = true; armAwait(false); log("resuming login after reset"); }
+  else sessionStorage.removeItem(AUTO_LOGIN);
+} catch {}
 
 let prevCount = 0;
 client.subscribe(() => {

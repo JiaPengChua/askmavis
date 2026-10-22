@@ -48,7 +48,11 @@
         });
       },
     });
-    if (params.has("reset")) { await ada.reset(); history.replaceState(null, "", location.pathname); }  } catch (e) {
+    if (params.has("reset")) { await ada.reset(); history.replaceState(null, "", location.pathname); }
+    // The custom app's Login button asks for a fresh session (reset() is a host-only SDK method).
+    window.addEventListener("message", (e) => {
+      if (e.origin === location.origin && e.data?.type === "askmavis:reset") ada.reset().catch((err) => console.warn("[askmavis] reset failed", err));
+    });  } catch (e) {
     note.textContent = `AskMavis could not start (${e.message || e}).`;
     note.hidden = false;
   }
