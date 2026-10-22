@@ -274,7 +274,10 @@ function paint() {
   $("thread").hidden = heroMode;
   if (heroMode) return;
 
-  const visible = from >= 0 ? all.slice(from) : pendingFirst ? [{ id: "pending", sender: "user", type: "text", body: pendingFirst }] : [];
+  // The declined Greeting can still be streaming its guest lines after the customer's question.
+  const GREETING_NOISE = /^(good (morning|afternoon|evening)!?|how can i assist you today\?[\s\S]*type your request\.?)$/i;
+  const visible = (from >= 0 ? all.slice(from) : pendingFirst ? [{ id: "pending", sender: "user", type: "text", body: pendingFirst }] : [])
+    .filter((m) => !(m.sender === "bot" && m.type === "text" && GREETING_NOISE.test((m.body || "").trim())));
   const typing = st["chat.isGenerating"] || st["ui.typingIndicator.visible"] || pendingOwnSend || !!pendingFirst;
   const sig = JSON.stringify([visible.map((m) => [m.id, m.clientKey, (m.body || "").length, m.type]), st["chat.answeredInteractiveIds"], typing]);
   if (sig === lastSig) return;
