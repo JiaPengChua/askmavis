@@ -87,36 +87,34 @@ function login() {
     client.operations.selectQuickReply(ask.message.replies[ask.yes], ask.message.id);
     render();
   } else {
-    // The Greeting's question has scrolled past. Only the host SDK can re-run the Greeting, so ask
-    // the host page (same origin) to call triggerGreeting(); paint() answers the fresh ask with Yes.
-    // Typing "sign in" instead only gets a knowledge answer pointing at the Enrich website.
-    log("login → asking host to re-run the Greeting");
-    awaitingAsk = Date.now();
-    setTimeout(() => { lastSig = ""; paint(); }, 20500); // fire the fallback even if nothing arrives
-    window.top.postMessage({ type: "askmavis:triggerGreeting" }, location.origin);
+    // The Greeting's question has scrolled past. Typing "sign in" mid-chat is unreliable (it can get
+    // a knowledge answer pointing at the Enrich website) and triggerGreeting() is a no-op once a
+    // greeting was sent. A new conversation reruns the Greeting; the old messages stay on screen.
+    log("login → new conversation for a fresh Greeting");
+    armAwait(false);
+    if (!client.operations.startNewConversation()) setTimeout(() => client.operations.startNewConversation(), 5200);
   }
 }
-let awaitingAsk = 0;
+let awaitingAsk = 0, fellBack = false;
+function armAwait(isFallback) {
+  awaitingAsk = Date.now();
+  fellBack = isFallback;
+  setTimeout(() => { lastSig = ""; paint(); }, 25500); // run the timeout branch even if nothing arrives
+}
 function answerFreshAsk(list) {
   if (!awaitingAsk) return;
   const ask = findSignInAsk(norm(list));
   if (ask) {
     awaitingAsk = 0;
-    log("login → answering re-run Greeting ask: Yes");
+    log("login → answering the Greeting's sign-in ask: Yes");
     client.operations.selectQuickReply(ask.message.replies[ask.yes], ask.message.id);
-  } else if (Date.now() - awaitingAsk > 20000) {
-    awaitingAsk = 0;
-    log("login → Greeting did not ask, falling back to a typed request");
+  } else if (Date.now() - awaitingAsk > 25000) {
+    if (fellBack) { awaitingAsk = 0; loginPending = false; toast("Couldn't start Enrich sign-in — try again"); return; }
+    log("login → no Greeting ask, falling back to a typed request");
+    armAwait(true);
     send(LOGIN_TEXT, "login");
   }
 }
-window.addEventListener("message", (e) => {
-  if (e.origin === location.origin && e.data?.type === "askmavis:triggerGreeting:failed") {
-    log("host could not re-run the Greeting", e.data.error);
-    awaitingAsk = 0;
-    send(LOGIN_TEXT, "login");
-  }
-});
 
 function openSignIn(m) {
   const w = window.open(m.authLink, "enrich_signin", "popup=yes,width=480,height=720");
@@ -221,7 +219,7 @@ function render() {
   requestAnimationFrame(() => { renderQueued = false; paint(); });
 }
 
-let lastSig = "", pendingSince = 0;
+let lastSig = "", pendingSince = 0, convChecked = false;
 function paint() {
   const st = S();
   if (st["app.loading"] === false || (st["chat.messages"] || []).length) $("boot").classList.add("gone");
@@ -234,9 +232,12 @@ function paint() {
   bar.setLogin(signedIn ? "signed" : loginPending ? "busy" : "idle");
 
   // Where the visible thread starts. A marker from an earlier conversation (reload, End Chat) is stale.
+  // Checked once per page load: a new conversation started from this page (Login) keeps the marker.
   const conv = st["chat.conversationId"];
-  if (startAt && conv && startAt.conv && startAt.conv !== conv) setStartAt(null);
-  if (startAt && !startAt.conv && conv && startAt.id && !all.some((m) => m.id === startAt.id)) setStartAt(null);
+  if (conv && !convChecked) {
+    convChecked = true;
+    if (startAt && startAt.conv && startAt.conv !== conv && !all.some((m) => m.id === startAt.id || m.clientKey === startAt.key)) setStartAt(null);
+  }
   let from = -1;
   if (startAt) from = all.findIndex((m) => (startAt.key && m.clientKey === startAt.key) || (startAt.id && m.id === startAt.id));
   if (from < 0 && !startAt) from = all.findIndex((m) => m.sender === "user") >= 0 ? 0 : -1; // restored chat with no marker

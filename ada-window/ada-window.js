@@ -130,11 +130,15 @@ async function login() {
   try {
     let ask = findSignInAsk(messages);
     if (!ask) {
-      // The Greeting's question has scrolled past — run the Greeting again so it asks afresh.
-      // (Typing "sign in" mid-chat only gets a knowledge answer pointing at the Enrich website.)
-      log("login: re-running Greeting");
-      await ada.triggerGreeting();
-      ask = await waitFor(() => findSignInAsk(messages), 20000);
+      // The Greeting's question has scrolled past. Typing "sign in" mid-chat is unreliable (it can
+      // get a knowledge answer pointing at the Enrich website) and triggerGreeting() is a no-op once
+      // a greeting was sent, so start a fresh conversation — like SQ, where login reloads the page.
+      log("login: fresh conversation for the Greeting's sign-in ask");
+      toast("Starting a new chat to sign you in…");
+      messages.length = 0;
+      await ada.reset();
+      loginMark = 0;
+      ask = await waitFor(() => findSignInAsk(messages), 25000);
     }
     if (ask) {
       log("login: answering Greeting sign-in ask", ask.message.id);
