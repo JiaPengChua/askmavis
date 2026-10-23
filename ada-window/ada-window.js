@@ -2,9 +2,9 @@
 // Web SDK. Cards, Smart Options and the feedback icon call sendMessage(); Login answers the
 // Greeting's sign-in question through selectQuickReply().
 import { createAdaEmbedInterface } from "https://messaging-assets.ada.support/sdk.js";
-import { HANDLE, FEEDBACK_TEXT, LOGIN_TEXT } from "../shared/content.js";
-import { buildBar, buildHero, buildPanel, disclaimerHtml, toast, MH_HEADER } from "../shared/chrome.js";
-import { findSignInAsk, looksSignedIn } from "../shared/login.js";
+import { HANDLE, FEEDBACK_TEXT, LOGIN_TEXT } from "../shared/content.js?v=20261023b";
+import { buildBar, buildHero, buildPanel, disclaimerHtml, toast, MH_HEADER } from "../shared/chrome.js?v=20261023b";
+import { findSignInAsk, looksSignedIn } from "../shared/login.js?v=20261023b";
 
 const ASSETS = "../assets/";
 const params = new URLSearchParams(location.search);

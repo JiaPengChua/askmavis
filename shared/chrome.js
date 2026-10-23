@@ -1,6 +1,6 @@
 // Builds the AI Mode chrome (sub-header, hero, prompt cards, Smart Options panel).
 // The page decides what a click does — every option funnels into `onSend(text, source)`.
-import { HERO, CARDS, SMART_OPTIONS, PROMPTS, TERMS_URL } from "./content.js";
+import { HERO, CARDS, SMART_OPTIONS, PROMPTS, TERMS_URL } from "./content.js?v=20261023b";
 
 export const ICONS = {
   sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M10 3.5l1.6 4.4 4.4 1.6-4.4 1.6L10 15.5l-1.6-4.4L4 9.5l4.4-1.6z"/><path d="M17.5 13l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z" fill="currentColor"/></svg>',
@@ -109,6 +109,6 @@ export const MH_HEADER = (assetBase) => `
     </nav>
     <div class="mh-util">
       <span class="hide-sm"><img src="${assetBase}flag-my-en.png" alt="">EN</span>
-      <a class="mh-askmh" href="https://jiapengchua.github.io/askmavis-mockup/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-.9.6-1.6 1.1-1.6 2.2M12 16.8v.2" stroke-linecap="round"/></svg>AskMH</a>
+      <a class="mh-askmh" href="https://jiapengchua.github.io/askmavis-mockup/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-.9.6-1.6 1.1-1.6 2.2M12 16.8v.2" stroke-linecap="round"/></svg>AskMH</a>
     </div>
   </div>`;

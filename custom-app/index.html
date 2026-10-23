@@ -8,7 +8,7 @@
 <link rel="icon" href="../assets/mh-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../shared/brand.css">
+<link rel="stylesheet" href="../shared/brand.css?v=20261023b">
 <style>
   html,body{height:100%}
   body{display:flex;flex-direction:column;background:var(--page-bg)}
@@ -23,8 +23,8 @@
 <main id="ada-root" aria-label="AskMavis"><div class="boot">Loading AskMavis…</div></main>
 <script type="module">
   import { createAdaEmbedInterface } from "https://messaging-assets.ada.support/sdk.js";
-  import { HANDLE } from "../shared/content.js";
-  import { MH_HEADER } from "../shared/chrome.js";
+  import { HANDLE } from "../shared/content.js?v=20261023b";
+  import { MH_HEADER } from "../shared/chrome.js?v=20261023b";
 
   document.getElementById("mh-header").innerHTML = MH_HEADER("../assets/");
   const note = document.getElementById("am-note");

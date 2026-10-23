@@ -1,9 +1,9 @@
 // AskMavis custom app — runs inside Ada's Messaging frame (appUrl). Ada core owns the session,
 // transport and the AI agent; this document renders the AI Mode UI from the bridge display state.
-import { loadMessagingBridge } from "./bridge-loader.js";
-import { FEEDBACK_TEXT, LOGIN_TEXT } from "../../shared/content.js";
-import { buildBar, buildHero, buildPanel, disclaimerHtml, toast, ICONS } from "../../shared/chrome.js";
-import { findSignInAsk, looksSignedIn } from "../../shared/login.js";
+import { loadMessagingBridge } from "./bridge-loader.js?v=20261023b";
+import { FEEDBACK_TEXT, LOGIN_TEXT } from "../../shared/content.js?v=20261023b";
+import { buildBar, buildHero, buildPanel, disclaimerHtml, toast, ICONS } from "../../shared/chrome.js?v=20261023b";
+import { findSignInAsk, looksSignedIn } from "../../shared/login.js?v=20261023b";
 
 const ASSETS = "../../assets/";
 const $ = (id) => document.getElementById(id);
