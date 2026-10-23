@@ -1,16 +1,16 @@
 # AskMavis AI Mode
 
-Mockups of a Singapore Airlines–style "AI Mode" chat for Malaysia Airlines, driven by the
+Mockups of an "AI Mode" chat for Malaysia Airlines, driven by the
 `malaysiaairlines-sandbox` Ada AI agent through Ada's **Messaging Web SDK**.
 
 | Page | URL | What it shows |
 | --- | --- | --- |
 | Custom app | https://jiapengchua.github.io/askmavis/custom-app/ | Our own conversation UI, loaded by Ada into its frame (`appUrl`). Ada keeps the session and the AI agent; we draw everything you see. |
-| Ada window | https://jiapengchua.github.io/askmavis/ada-window/ | Ada's own chat window placed in the page (`parentElement`), with the SQ hero, cards and Smart Options around it. |
+| Ada window | https://jiapengchua.github.io/askmavis/ada-window/ | Ada's own chat window placed in the page (`parentElement`), with the hero, prompt cards and Smart Options around it. |
 
-Both pages copy SQ's layout and options: the AI Mode bar (Flight Finder · Login · feedback),
+Both pages share the same layout and options: the AI Mode bar (Flight Finder · Login · feedback),
 the "Hi there" hero with three prompt cards, the composer, and the **View Smart Options** panel.
-KrisFlyer → Enrich and SIN → KUL. Every option sends a fixed phrase to Ada; the phrases are in
+Every option sends a fixed phrase to Ada; the phrases are in
 [shared/content.js](shared/content.js).
 
 ## Login
@@ -22,7 +22,7 @@ that leads to the real Enrich (Azure B2C, UAT) login.
 
 - **Question still on screen:** Login answers **Yes** (`selectQuickReply`).
 - **Conversation has moved on:** the page calls `reset()` for a fresh conversation, then answers
-  the new Greeting's question with Yes. Like SQ, logging in starts you over.
+  the new Greeting's question with Yes. Logging in starts the chat over.
 - **Custom app:** the app draws Ada's `sign_in` message as an Enrich card. Its button opens
   `authLink` in a popup.
 - **Ada window:** Ada shows its own **Sign In** button.

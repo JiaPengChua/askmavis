@@ -132,7 +132,7 @@ async function login() {
     if (!ask) {
       // The Greeting's question has scrolled past. Typing "sign in" mid-chat is unreliable (it can
       // get a knowledge answer pointing at the Enrich website) and triggerGreeting() is a no-op once
-      // a greeting was sent, so start a fresh conversation — like SQ, where login reloads the page.
+      // a greeting was sent, so start a fresh conversation, as a login page redirect would.
       log("login: fresh conversation for the Greeting's sign-in ask");
       toast("Starting a new chat to sign you in…");
       messages.length = 0;

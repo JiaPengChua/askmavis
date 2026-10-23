@@ -1,5 +1,5 @@
 // AskMavis custom app — runs inside Ada's Messaging frame (appUrl). Ada core owns the session,
-// transport and the AI agent; this document renders the SQ-style UI from the bridge display state.
+// transport and the AI agent; this document renders the AI Mode UI from the bridge display state.
 import { loadMessagingBridge } from "./bridge-loader.js";
 import { FEEDBACK_TEXT, LOGIN_TEXT } from "../../shared/content.js";
 import { buildBar, buildHero, buildPanel, disclaimerHtml, toast, ICONS } from "../../shared/chrome.js";
@@ -32,7 +32,7 @@ try {
 const S = () => client.getState() || {};
 
 /* ---------- view state ---------- */
-// The Greeting runs before the customer does anything. Like SQ, the hero stands in for it, so the
+// The Greeting runs before the customer does anything. The hero stands in for it, so the
 // thread starts at the customer's first action: `startAt` names that row (by id or clientKey).
 const KEY = "askmavis.startAt";
 let startAt = (() => { try { return JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch { return null; } })();
@@ -100,7 +100,7 @@ function login() {
     // The Greeting's question has scrolled past. Typing "sign in" mid-chat is unreliable (it can get
     // a knowledge answer pointing at the Enrich website), triggerGreeting() is a no-op once a greeting
     // was sent, and startNewConversation() closed the chat without opening a new one in testing.
-    // So the host page resets the session (like SQ, where login reloads the page) and the fresh
+    // So the host page resets the session (as a login page redirect would) and the fresh
     // Greeting's sign-in ask is answered with Yes. A reset can remount this frame, hence storage.
     log("login → host reset for a fresh Greeting");
     toast("Starting a new chat to sign you in…");

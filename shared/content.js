@@ -1,5 +1,4 @@
-// Everything a customer can click, copied from singaporeair.com/ai-mode/chat and re-pointed at
-// Malaysia Airlines (KrisFlyer -> Enrich, SIN -> KUL). `send` is the exact text handed to Ada.
+// Everything a customer can click. `send` is the exact text handed to Ada.
 
 export const HANDLE = "malaysiaairlines-sandbox";
 

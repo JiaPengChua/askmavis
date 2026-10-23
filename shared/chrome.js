@@ -1,4 +1,4 @@
-// Builds the SQ-style AI Mode chrome (sub-header, hero, prompt cards, Smart Options panel).
+// Builds the AI Mode chrome (sub-header, hero, prompt cards, Smart Options panel).
 // The page decides what a click does — every option funnels into `onSend(text, source)`.
 import { HERO, CARDS, SMART_OPTIONS, PROMPTS, TERMS_URL } from "./content.js";
 
