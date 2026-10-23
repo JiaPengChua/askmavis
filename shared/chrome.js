@@ -109,6 +109,6 @@ export const MH_HEADER = (assetBase) => `
     </nav>
     <div class="mh-util">
       <span class="hide-sm"><img src="${assetBase}flag-my-en.png" alt="">EN</span>
-      <span>AskMavis</span>
+      <a class="mh-askmh" href="https://jiapengchua.github.io/askmavis-mockup/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-.9.6-1.6 1.1-1.6 2.2M12 16.8v.2" stroke-linecap="round"/></svg>AskMH</a>
     </div>
   </div>`;

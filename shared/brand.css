@@ -35,6 +35,9 @@ svg.i{width:18px;height:18px;flex:none}
 .mh-util{display:flex;align-items:center;gap:18px;flex:none;font-size:14px;font-weight:500}
 .mh-util img{width:20px;height:20px;border-radius:50%}
 .mh-util span{display:flex;align-items:center;gap:7px}
+.mh-askmh{display:flex;align-items:center;gap:7px;color:var(--text-color);text-decoration:none}
+.mh-askmh:hover{color:var(--primary-blue-base)}
+.mh-askmh svg{width:22px;height:22px}
 @media(max-width:900px){.mh-nav,.mh-util .hide-sm{display:none}.mh-header-in{justify-content:space-between}}
 
 /* ---------- AI Mode sub-header ---------- */
